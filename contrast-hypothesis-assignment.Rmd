@@ -1,0 +1,34 @@
+---
+title: "Propuesta de Análisis de Datos"
+author: "María Eugenia Castellanos"
+date: "5 de enero de 2017"
+output: 
+  html_document: 
+  css: style.css
+theme: spacelab
+---
+  
+
+En el fichero Deportistas.csv aparecen datos sobre estatura, peso, ı́ndice de masa corporal, etc. en una muestra de deportistas profesionales australianos.
+En concreto aparecen las siguientes variables:
+
+* Sex: Sexo del deportista (0=hombre, 1=mujer);
+* Ht: Altura (en cm.)
+* Wt: Peso (en Kg.);
+* BMI: Índice de masa corporal;
+* Bfat: Porcentaje de grasa corporal;
+* Sport: Deporte;
+
+```{r, message=FALSE, warning=FALSE}
+# Importación de bibliotecas y lectura de datos desde fichero externo
+
+athletes_data <- read.csv('./Deportistas.csv')
+```
+
+### 1. Realiza un análisis descriptivo de los datos.
+
+### 2. Calcula un intervalo de confianza al 98 % para el BMI medio de los deportistas masculinos. Obtén también el intervalo de confianza del mismo nivel para el BMI esperado en el caso de las mujeres deportistas.
+
+### 3. Plantea y realiza el contraste de hipótesis que permita afirmar si hay diferencias entre el BMI medio de los deportistas en base a su sexo.
+
+### 4. Y con respecto al porcentaje de grasa corportal, ¿qué se puede decir?
