@@ -21,11 +21,55 @@ En concreto aparecen las siguientes variables:
 
 ```{r, message=FALSE, warning=FALSE}
 # Importación de bibliotecas y lectura de datos desde fichero externo
+library(dplyr)
+library(magrittr)
+library(knitr)
 
 athletes_data <- read.csv('./Deportistas.csv')
 ```
 
 ### 1. Realiza un análisis descriptivo de los datos.
+
+Sin filtros
+```{r 1A}
+athletes_data %>%
+  select(Ht, Wt, BMI, Bfat) %>%
+  select(order(colnames(.))) %>%
+  summary() %>%
+  kable()
+```
+
+Por sexo: Masculino y Femenino
+```{r 1B}
+athletes_data %>%
+  mutate(Sex = factor(Sex, labels=c('M','F'))) %>% 
+  group_by(Sex) %>%
+  select(Sex, Ht, Wt, BMI, Bfat) %>%
+  summarise_each(funs(mean, median, min, max)) %>%
+  select(Sex, order(colnames(.))) %>%
+  kable()
+```
+
+Por deporte
+```{r 1C}
+athletes_data %>%
+  group_by(Sport) %>%
+  select(Sport, Ht, Wt, BMI, Bfat) %>%
+  summarise_each(funs(mean, median, min, max)) %>%
+  select(Sport, order(colnames(.))) %>%
+  kable()
+```
+
+Por sexo y deporte
+```{r 1D}
+athletes_data %>%
+  mutate(Sex = factor(Sex, labels=c('M','F'))) %>%
+  group_by(Sex, Sport) %>%
+  select(Sex, Sport, Ht, Wt, BMI, Bfat) %>%
+  summarise_each(funs(mean, median, min, max)) %>%
+  select(Sex, Sport, order(colnames(.))) %>%  
+  kable()
+```
 
 ### 2. Calcula un intervalo de confianza al 98 % para el BMI medio de los deportistas masculinos. Obtén también el intervalo de confianza del mismo nivel para el BMI esperado en el caso de las mujeres deportistas.
 
