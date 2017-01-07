@@ -97,4 +97,24 @@ El intervalo de confianza del 98% para el BMI medio en deportistas Femeninos es 
 
 ### 3. Plantea y realiza el contraste de hipótesis que permita afirmar si hay diferencias entre el BMI medio de los deportistas en base a su sexo.
 
+$H_0: BMImedio_M = BMImedio_F$
+$H_1: BMImedio_M \neq BMImedio_F$
+
+```{r 3}
+alpha <- 0.003
+conf <- 1 - alpha
+
+M_BMI <- BMI_and_sex %>%
+          filter(Sex == 'M') %>%
+          select(BMI)
+
+F_BMI <- BMI_and_sex %>%
+          filter(Sex == 'F') %>%
+          select(BMI) 
+
+BMImedio_F <- F_BMI %>% summarise(mean(BMI)) %>% .[1,1]
+
+t.test(M_BMI, alternative='two.sided', mu=BMImedio_F, conf.level=conf)
+```
+
 ### 4. Y con respecto al porcentaje de grasa corportal (Bfat), ¿qué se puede decir?
