@@ -117,4 +117,32 @@ BMImedio_F <- F_BMI %>% summarise(mean(BMI)) %>% .[1,1]
 t.test(M_BMI, alternative='two.sided', mu=BMImedio_F, conf.level=conf)
 ```
 
+Como el p-valor es menor que el valor de alfa $3.071·10^{-10} \lt 0.003$, rechazamos la $H_0$, es decir, rechazamos que no haya diferencias entre el BMI medio de los deportistas en base a su sexo.
+
 ### 4. Y con respecto al porcentaje de grasa corportal (Bfat), ¿qué se puede decir?
+
+$H_0: BfatMedio_M = BfatMedio_F$
+$H_1: BfatMedio_M \neq BfatMedio_F$
+
+```{r 4}
+alpha <- 0.003
+conf <- 1 - alpha
+
+Bfat_and_sex <- athletes_data %>%
+                select(Sex, Bfat) %>%
+                mutate(Sex = factor(Sex, labels=c('M','F')))
+
+M_Bfat <- Bfat_and_sex %>%
+          filter(Sex == 'M') %>%
+          select(Bfat)
+
+F_Bfat <- Bfat_and_sex %>%
+          filter(Sex == 'F') %>%
+          select(Bfat) 
+
+BfatMedio_F <- F_Bfat %>% summarise(mean(Bfat)) %>% .[1,1]
+
+t.test(M_Bfat, alternative='two.sided', mu=BfatMedio_F, conf.level=conf)
+```
+
+Como el p-valor es menor que el valor de alfa $2.2·10^{-16} \lt 0.003$, rechazamos la $H_0$, es decir, rechazamos que no haya diferencias entre el porcentaje de grasa corporal medio de los deportistas en base a su sexo.
