@@ -12,12 +12,12 @@ theme: spacelab
 En el fichero Deportistas.csv aparecen datos sobre estatura, peso, ı́ndice de masa corporal, etc. en una muestra de deportistas profesionales australianos.
 En concreto aparecen las siguientes variables:
 
-* Sex: Sexo del deportista (0=hombre, 1=mujer);
+* Sex: Sexo del deportista (0=hombre, 1=mujer)
 * Ht: Altura (en cm.)
-* Wt: Peso (en Kg.);
-* BMI: Índice de masa corporal;
-* Bfat: Porcentaje de grasa corporal;
-* Sport: Deporte;
+* Wt: Peso (en Kg.)
+* BMI: Índice de masa corporal
+* Bfat: Porcentaje de grasa corporal
+* Sport: Deporte
 
 ```{r, message=FALSE, warning=FALSE}
 # Importación de bibliotecas y lectura de datos desde fichero externo
@@ -73,6 +73,28 @@ athletes_data %>%
 
 ### 2. Calcula un intervalo de confianza al 98 % para el BMI medio de los deportistas masculinos. Obtén también el intervalo de confianza del mismo nivel para el BMI esperado en el caso de las mujeres deportistas.
 
+```{r 2A}
+BMI_and_sex <- athletes_data %>%
+                select(Sex, BMI) %>%
+                mutate(Sex = factor(Sex, labels=c('M','F')))
+
+BMI_and_sex %>%
+  filter(Sex == 'M') %>%
+  select(BMI) %>%
+  t.test(., conf=0.98)
+```
+
+El intervalo de confianza del 98% para el BMI medio en deportistas Masculinos es $[23.25589, 24.55137]$.
+
+```{r 2B}
+BMI_and_sex %>%
+  filter(Sex == 'F') %>%
+  select(BMI) %>%
+  t.test(., conf=0.98)
+```
+
+El intervalo de confianza del 98% para el BMI medio en deportistas Femeninos es $[21.36494, 22.61346]$.
+
 ### 3. Plantea y realiza el contraste de hipótesis que permita afirmar si hay diferencias entre el BMI medio de los deportistas en base a su sexo.
 
-### 4. Y con respecto al porcentaje de grasa corportal, ¿qué se puede decir?
+### 4. Y con respecto al porcentaje de grasa corportal (Bfat), ¿qué se puede decir?
