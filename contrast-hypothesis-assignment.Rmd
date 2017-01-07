@@ -97,8 +97,8 @@ El intervalo de confianza del 98% para el BMI medio en deportistas Femeninos es 
 
 ### 3. Plantea y realiza el contraste de hipótesis que permita afirmar si hay diferencias entre el BMI medio de los deportistas en base a su sexo.
 
-$H_0: BMImedio_M = BMImedio_F$
-$H_1: BMImedio_M \neq BMImedio_F$
+$$H_0: BMImedio_M = BMImedio_F$$
+$$H_1: BMImedio_M \neq BMImedio_F$$
 
 ```{r 3}
 alpha <- 0.003
@@ -121,8 +121,8 @@ Como el p-valor es menor que el valor de alfa $3.071·10^{-10} \lt 0.003$, recha
 
 ### 4. Y con respecto al porcentaje de grasa corportal (Bfat), ¿qué se puede decir?
 
-$H_0: BfatMedio_M = BfatMedio_F$
-$H_1: BfatMedio_M \neq BfatMedio_F$
+$$H_0: BfatMedio_M = BfatMedio_F$$
+$$H_1: BfatMedio_M \neq BfatMedio_F$$
 
 ```{r 4}
 alpha <- 0.003
