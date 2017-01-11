@@ -910,7 +910,7 @@ BMI_and_sex %&gt;%
 </div>
 <div id="plantea-y-realiza-el-contraste-de-hipotesis-que-permita-afirmar-si-hay-diferencias-entre-el-bmi-medio-de-los-deportistas-en-base-a-su-sexo." class="section level3">
 <h3>3. Plantea y realiza el contraste de hipótesis que permita afirmar si hay diferencias entre el BMI medio de los deportistas en base a su sexo.</h3>
-<p><span class="math display">\[H_0: BMImedio_M = BMImedio_F\]</span> <span class="math display">\[H_1: BMImedio_M \neq BMImedio_F\]</span></p>
+<p><span class="math display">\[H_0: \mu BMI_M = \mu BMI_F\]</span> <span class="math display">\[H_1: \mu BMI_M \neq \mu BMI_F\]</span></p>
 <pre class="r"><code>alpha &lt;- 0.003
 conf &lt;- 1 - alpha
 
@@ -920,27 +920,42 @@ M_BMI &lt;- BMI_and_sex %&gt;%
 
 F_BMI &lt;- BMI_and_sex %&gt;%
           filter(Sex == 'F') %&gt;%
-          select(BMI) 
-
-BMImedio_F &lt;- F_BMI %&gt;% summarise(mean(BMI)) %&gt;% .[1,1]
-
-t.test(M_BMI, alternative='two.sided', mu=BMImedio_F, conf.level=conf)</code></pre>
+          select(BMI) </code></pre>
+<p>Antes de poder seguir adelante con el contraste de las medias, es necesario saber si hay o no diferencias significativas entre las varianzas.</p>
+<p>Para ello, vamos a realizar un nuevo contraste de hipótesis.</p>
+<p><span class="math display">\[H_0: \sigma^2 BMI_M = \sigma^2 BMI_F\]</span></p>
+<p><span class="math display">\[H_1: \sigma^2 BMI_M \neq \sigma^2 BMI_F\]</span></p>
+<pre class="r"><code>var.test(x = as.matrix(M_BMI), y = as.matrix(F_BMI), ratio = 1, alternative = 'two.sided', conf.level = conf)</code></pre>
 <pre><code>## 
-##  One Sample t-test
+##  F test to compare two variances
 ## 
-## data:  M_BMI
-## t = 6.9864, df = 101, p-value = 3.071e-10
-## alternative hypothesis: true mean is not equal to 21.9892
+## data:  as.matrix(M_BMI) and as.matrix(F_BMI)
+## F = 1.0989, num df = 101, denom df = 99, p-value = 0.6388
+## alternative hypothesis: true ratio of variances is not equal to 1
 ## 99.7 percent confidence interval:
-##  23.07021 24.73704
+##  0.6029699 1.9997363
 ## sample estimates:
-## mean of x 
-##  23.90363</code></pre>
-<p>Como el p-valor es menor que el valor de alfa <span class="math inline">\(3.071·10^{-10} \lt 0.003\)</span>, rechazamos la <span class="math inline">\(H_0\)</span>, es decir, rechazamos que no haya diferencias entre el BMI medio de los deportistas en base a su sexo.</p>
+## ratio of variances 
+##           1.098884</code></pre>
+<p>En este caso nos da un p-valor de 0.6388 que es mucho mayor que el alpha que hemos elegido de 0.003, por lo tanto en este caso se entiende que no hay diferencias significativas entre las varianzas porque no podemos rechazar <span class="math inline">\(H_0\)</span>.</p>
+<p>Finalmente continuamos con el contraste de las medias:</p>
+<pre class="r"><code>t.test(x = M_BMI, y = F_BMI, alternative='two.sided', mu=0, paired = FALSE, var.equal = TRUE, conf.level=conf)</code></pre>
+<pre><code>## 
+##  Two Sample t-test
+## 
+## data:  M_BMI and F_BMI
+## t = 5.0289, df = 200, p-value = 1.094e-06
+## alternative hypothesis: true difference in means is not equal to 0
+## 99.7 percent confidence interval:
+##  0.7706465 3.0582084
+## sample estimates:
+## mean of x mean of y 
+##  23.90363  21.98920</code></pre>
+<p>Como el p-valor es menor que el valor de alfa <span class="math inline">\(1.094·10^{-6} \lt 0.003\)</span>, rechazamos la <span class="math inline">\(H_0\)</span>, es decir, hay diferencias entre el BMI medio de los deportistas en base a su sexo.</p>
 </div>
 <div id="y-con-respecto-al-porcentaje-de-grasa-corportal-bfat-que-se-puede-decir" class="section level3">
 <h3>4. Y con respecto al porcentaje de grasa corportal (Bfat), ¿qué se puede decir?</h3>
-<p><span class="math display">\[H_0: BfatMedio_M = BfatMedio_F\]</span> <span class="math display">\[H_1: BfatMedio_M \neq BfatMedio_F\]</span></p>
+<p><span class="math display">\[H_0: \mu Bfat_M = \mu Bfat_F\]</span> <span class="math display">\[H_1: \mu Bfat_M \neq \mu Bfat_F\]</span></p>
 <pre class="r"><code>alpha &lt;- 0.003
 conf &lt;- 1 - alpha
 
@@ -954,23 +969,38 @@ M_Bfat &lt;- Bfat_and_sex %&gt;%
 
 F_Bfat &lt;- Bfat_and_sex %&gt;%
           filter(Sex == 'F') %&gt;%
-          select(Bfat) 
-
-BfatMedio_F &lt;- F_Bfat %&gt;% summarise(mean(Bfat)) %&gt;% .[1,1]
-
-t.test(M_Bfat, alternative='two.sided', mu=BfatMedio_F, conf.level=conf)</code></pre>
+          select(Bfat)</code></pre>
+<p>Antes de poder seguir adelante con el contraste de las medias, es necesario saber si hay o no diferencias significativas entre las varianzas.</p>
+<p>Para ello, vamos a realizar un nuevo contraste de hipótesis.</p>
+<p><span class="math display">\[H_0: \sigma^2 Bfat_M = \sigma^2 Bfat_F\]</span></p>
+<p><span class="math display">\[H_1: \sigma^2 Bfat_M \neq \sigma^2 Bfat_F\]</span></p>
+<pre class="r"><code>var.test(x = as.matrix(M_Bfat), y = as.matrix(F_Bfat), ratio = 1, alternative = 'two.sided', conf.level = conf)</code></pre>
 <pre><code>## 
-##  One Sample t-test
+##  F test to compare two variances
 ## 
-## data:  M_Bfat
-## t = -27.267, df = 101, p-value &lt; 2.2e-16
-## alternative hypothesis: true mean is not equal to 17.8491
+## data:  as.matrix(M_Bfat) and as.matrix(F_Bfat)
+## F = 0.3411, num df = 101, denom df = 99, p-value = 1.5e-07
+## alternative hypothesis: true ratio of variances is not equal to 1
 ## 99.7 percent confidence interval:
-##   8.291826 10.209939
+##  0.1871653 0.6207295
 ## sample estimates:
-## mean of x 
-##  9.250882</code></pre>
-<p>Como el p-valor es menor que el valor de alfa <span class="math inline">\(2.2·10^{-16} \lt 0.003\)</span>, rechazamos la <span class="math inline">\(H_0\)</span>, es decir, rechazamos que no haya diferencias entre el porcentaje de grasa corporal medio de los deportistas en base a su sexo.</p>
+## ratio of variances 
+##          0.3410999</code></pre>
+<p>En este caso nos da un p-valor de <span class="math inline">\(1.5·10^{-7}\)</span> que es menor que el alpha que hemos elegido de 0.003, por lo tanto en este caso se entiende que sí hay diferencias significativas entre las varianzas, por lo que rechazamos <span class="math inline">\(H_0\)</span>.</p>
+<p>Finalmente continuamos con el contraste de las medias:</p>
+<pre class="r"><code>t.test(x = M_Bfat, y = F_Bfat, alternative='two.sided', mu=0, paired = FALSE, var.equal = FALSE, conf.level=conf)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  M_Bfat and F_Bfat
+## t = -13.65, df = 158.87, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 99.7 percent confidence interval:
+##  -10.496861  -6.699574
+## sample estimates:
+## mean of x mean of y 
+##  9.250882 17.849100</code></pre>
+<p>En este caso, el p-valor es menor que <span class="math inline">\(2.2·10^{-16}\)</span>, y por lo tanto es menor que el alpha que hemos elegido de 0.003, así que rechazamos <span class="math inline">\(H_0\)</span> y eso quiere decir que sí hay diferencias en el porcentaje medio de grasa corporal en base al sexo de los deportistas.</p>
 </div>
 
 
