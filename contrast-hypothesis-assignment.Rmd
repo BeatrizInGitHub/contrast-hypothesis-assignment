@@ -138,10 +138,10 @@ Como el p-valor es menor que el valor de alfa $1.094·10^{-6} \lt 0.003$, rechaz
 
 ### 4. Y con respecto al porcentaje de grasa corportal (Bfat), ¿qué se puede decir?
 
-$$H_0: BfatMedio_M = BfatMedio_F$$
-$$H_1: BfatMedio_M \neq BfatMedio_F$$
+$$H_0: \mu Bfat_M = \mu Bfat_F$$
+$$H_1: \mu Bfat_M \neq \mu Bfat_F$$
 
-```{r 4}
+```{r 4A}
 alpha <- 0.003
 conf <- 1 - alpha
 
@@ -155,11 +155,29 @@ M_Bfat <- Bfat_and_sex %>%
 
 F_Bfat <- Bfat_and_sex %>%
           filter(Sex == 'F') %>%
-          select(Bfat) 
-
-BfatMedio_F <- F_Bfat %>% summarise(mean(Bfat)) %>% .[1,1]
-
-t.test(M_Bfat, alternative='two.sided', mu=BfatMedio_F, conf.level=conf)
+          select(Bfat)
 ```
 
-Como el p-valor es menor que el valor de alfa $2.2·10^{-16} \lt 0.003$, rechazamos la $H_0$, es decir, rechazamos que no haya diferencias entre el porcentaje de grasa corporal medio de los deportistas en base a su sexo.
+Antes de poder seguir adelante con el contraste de las medias, es necesario saber si hay o no diferencias significativas entre las varianzas.
+
+Para ello, vamos a realizar un nuevo contraste de hipótesis.
+
+$$H_0: \sigma^2 Bfat_M = \sigma^2 Bfat_F$$
+
+$$H_1: \sigma^2 Bfat_M \neq \sigma^2 Bfat_F$$
+
+```{r 4B}
+var.test(x = as.matrix(M_Bfat), y = as.matrix(F_Bfat), ratio = 1, alternative = 'two.sided', conf.level = conf)
+```
+
+En este caso nos da un p-valor de $1.5·10^{-7}$ que es menor que el alpha que hemos elegido de 0.003, por lo tanto en este caso se entiende que sí hay diferencias significativas entre las varianzas, por lo que rechazamos $H_0$.
+
+
+Finalmente continuamos con el contraste de las medias:
+
+
+```{r 4C}
+t.test(x = M_Bfat, y = F_Bfat, alternative='two.sided', mu=0, paired = FALSE, var.equal = FALSE, conf.level=conf)
+```
+
+En este caso, el p-valor es menor que $2.2·10^{-16}$, y por lo tanto es menor que el alpha que hemos elegido de 0.003, así que rechazamos $H_0$ y eso quiere decir que sí hay diferencias en el porcentaje medio de grasa corporal en base al sexo de los deportistas.
