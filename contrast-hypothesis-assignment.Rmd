@@ -21,8 +21,11 @@ En concreto aparecen las siguientes variables:
 
 ```{r, message=FALSE, warning=FALSE}
 # Importación de bibliotecas y lectura de datos desde fichero externo
+#install.packages("dplyr")
 library(dplyr)
+#install.packages("magrittr")
 library(magrittr)
+#install.packages("knitr")
 library(knitr)
 
 athletes_data <- read.csv('./Deportistas.csv')
