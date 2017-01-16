@@ -1,0 +1,186 @@
+---
+title: "Propuesta de Análisis de Datos"
+author: "María Eugenia Castellanos"
+date: "5 de enero de 2017"
+output: 
+  html_document: 
+  css: style.css
+theme: spacelab
+---
+  
+
+En el fichero Deportistas.csv aparecen datos sobre estatura, peso, ı́ndice de masa corporal, etc. en una muestra de deportistas profesionales australianos.
+En concreto aparecen las siguientes variables:
+
+* Sex: Sexo del deportista (0=hombre, 1=mujer)
+* Ht: Altura (en cm.)
+* Wt: Peso (en Kg.)
+* BMI: Índice de masa corporal
+* Bfat: Porcentaje de grasa corporal
+* Sport: Deporte
+
+```{r, message=FALSE, warning=FALSE}
+# Importación de bibliotecas y lectura de datos desde fichero externo
+#install.packages("dplyr")
+library(dplyr)
+#install.packages("magrittr")
+library(magrittr)
+#install.packages("knitr")
+library(knitr)
+
+athletes_data <- read.csv('./Deportistas.csv')
+```
+
+### 1. Realiza un análisis descriptivo de los datos.
+
+Sin filtros
+```{r 1A}
+athletes_data %>%
+  select(Ht, Wt, BMI, Bfat) %>%
+  select(order(colnames(.))) %>%
+  summary() %>%
+  kable()
+```
+
+Por sexo: Masculino y Femenino
+```{r 1B}
+athletes_data %>%
+  mutate(Sex = factor(Sex, labels=c('M','F'))) %>% 
+  group_by(Sex) %>%
+  select(Sex, Ht, Wt, BMI, Bfat) %>%
+  summarise_each(funs(mean, median, min, max)) %>%
+  select(Sex, order(colnames(.))) %>%
+  kable()
+```
+
+Por deporte
+```{r 1C}
+athletes_data %>%
+  group_by(Sport) %>%
+  select(Sport, Ht, Wt, BMI, Bfat) %>%
+  summarise_each(funs(mean, median, min, max)) %>%
+  select(Sport, order(colnames(.))) %>%
+  kable()
+```
+
+Por sexo y deporte
+```{r 1D}
+athletes_data %>%
+  mutate(Sex = factor(Sex, labels=c('M','F'))) %>%
+  group_by(Sex, Sport) %>%
+  select(Sex, Sport, Ht, Wt, BMI, Bfat) %>%
+  summarise_each(funs(mean, median, min, max)) %>%
+  select(Sex, Sport, order(colnames(.))) %>%  
+  kable()
+```
+
+### 2. Calcula un intervalo de confianza al 98 % para el BMI medio de los deportistas masculinos. Obtén también el intervalo de confianza del mismo nivel para el BMI esperado en el caso de las mujeres deportistas.
+
+```{r 2A}
+BMI_and_sex <- athletes_data %>%
+                select(Sex, BMI) %>%
+                mutate(Sex = factor(Sex, labels=c('M','F')))
+
+BMI_and_sex %>%
+  filter(Sex == 'M') %>%
+  select(BMI) %>%
+  t.test(., conf=0.98)
+```
+
+El intervalo de confianza del 98% para el BMI medio en deportistas Masculinos es $[23.25589, 24.55137]$.
+
+```{r 2B}
+BMI_and_sex %>%
+  filter(Sex == 'F') %>%
+  select(BMI) %>%
+  t.test(., conf=0.98)
+```
+
+El intervalo de confianza del 98% para el BMI medio en deportistas Femeninos es $[21.36494, 22.61346]$.
+
+### 3. Plantea y realiza el contraste de hipótesis que permita afirmar si hay diferencias entre el BMI medio de los deportistas en base a su sexo.
+
+$$H_0: \mu BMI_M = \mu BMI_F$$
+$$H_1: \mu BMI_M \neq \mu BMI_F$$
+
+```{r 3A}
+alpha <- 0.003
+conf <- 1 - alpha
+
+M_BMI <- BMI_and_sex %>%
+          filter(Sex == 'M') %>%
+          select(BMI)
+
+F_BMI <- BMI_and_sex %>%
+          filter(Sex == 'F') %>%
+          select(BMI) 
+```
+
+Antes de poder seguir adelante con el contraste de las medias, es necesario saber si hay o no diferencias significativas entre las varianzas.
+
+Para ello, vamos a realizar un nuevo contraste de hipótesis.
+
+$$H_0: \sigma^2 BMI_M = \sigma^2 BMI_F$$
+
+$$H_1: \sigma^2 BMI_M \neq \sigma^2 BMI_F$$
+```{r 3B}
+var.test(x = as.matrix(M_BMI), y = as.matrix(F_BMI), ratio = 1, alternative = 'two.sided', conf.level = conf)
+```
+
+En este caso nos da un p-valor de 0.6388 que es mucho mayor que el alpha que hemos elegido de 0.003, por lo tanto en este caso se entiende que no hay diferencias significativas entre las varianzas porque no podemos rechazar $H_0$.
+
+
+Finalmente continuamos con el contraste de las medias:
+
+
+```{r 3C}
+t.test(x = M_BMI, y = F_BMI, alternative='two.sided', mu=0, paired = FALSE, var.equal = TRUE, conf.level=conf)
+```
+
+Como el p-valor es menor que el valor de alfa $1.094·10^{-6} \lt 0.003$, rechazamos la $H_0$, es decir, hay diferencias entre el BMI medio de los deportistas en base a su sexo.
+
+### 4. Y con respecto al porcentaje de grasa corportal (Bfat), ¿qué se puede decir?
+
+$$H_0: \mu Bfat_M = \mu Bfat_F$$
+$$H_1: \mu Bfat_M \neq \mu Bfat_F$$
+
+```{r 4A}
+alpha <- 0.003
+conf <- 1 - alpha
+
+Bfat_and_sex <- athletes_data %>%
+                select(Sex, Bfat) %>%
+                mutate(Sex = factor(Sex, labels=c('M','F')))
+
+M_Bfat <- Bfat_and_sex %>%
+          filter(Sex == 'M') %>%
+          select(Bfat)
+
+F_Bfat <- Bfat_and_sex %>%
+          filter(Sex == 'F') %>%
+          select(Bfat)
+```
+
+Antes de poder seguir adelante con el contraste de las medias, es necesario saber si hay o no diferencias significativas entre las varianzas.
+
+Para ello, vamos a realizar un nuevo contraste de hipótesis.
+
+$$H_0: \sigma^2 Bfat_M = \sigma^2 Bfat_F$$
+
+$$H_1: \sigma^2 Bfat_M \neq \sigma^2 Bfat_F$$
+
+```{r 4B}
+var.test(x = as.matrix(M_Bfat), y = as.matrix(F_Bfat), ratio = 1, alternative = 'two.sided', conf.level = conf)
+```
+
+En este caso nos da un p-valor de $1.5·10^{-7}$ que es menor que el alpha que hemos elegido de 0.003, por lo tanto en este caso se entiende que sí hay diferencias significativas entre las varianzas, por lo que rechazamos $H_0$.
+
+
+Finalmente continuamos con el contraste de las medias:
+
+
+```{r 4C}
+t.test(x = M_Bfat, y = F_Bfat, alternative='two.sided', mu=0, paired = FALSE, var.equal = FALSE, conf.level=conf)
+```
+
+En este caso, el p-valor es menor que $2.2·10^{-16}$, y por lo tanto es menor que el alpha que hemos elegido de 0.003, así que rechazamos $H_0$ y eso quiere decir que sí hay diferencias en el porcentaje medio de grasa corporal en base al sexo de los deportistas.
